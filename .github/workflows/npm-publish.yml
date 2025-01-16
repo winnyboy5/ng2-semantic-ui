@@ -10,7 +10,7 @@ on:
       - master
 
 env:
-  NODE_VERSION: "18.x"
+  NODE_VERSION: "10.x"
 
 jobs:
   build:
