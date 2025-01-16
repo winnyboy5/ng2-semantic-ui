@@ -4,45 +4,34 @@
 name: Release CI
 
 on:
-  push:
-    tags: "*"
-    branches:
-      - master
-
-env:
-  NODE_VERSION: "10.x"
+release:
+  types: [created] # Trigger on release creation, not push
 
 jobs:
-  build:
-    name: Build and Release
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Build package
-        run: |
-          npm install
-          npm run build:prod
-      - name: Publish package
-        run: |
-          cd dist/lib
-          npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Create release
-        run: |
-          VERSION=${GITHUB_REF/refs\/tags\//}
-          gh release create "${VERSION}" -t "${VERSION}" --generate-notes
-          gh release view "${VERSION}"
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+publish-npm: # Combine build and release into one job
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3 # Use a more recent checkout action
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 10.x
+        registry-url: "https://registry.npmjs.org"
+        cache: 'npm' # Cache dependencies
+    - name: Install dependencies
+      run: npm ci  # Use npm ci for faster, more reliable installs
+    - name: Build package
+      run: npm run build:prod
+    - name: Publish package
+      run: npm publish --access public --provenance # Provenance is recommended
+      working-directory: dist/lib # Use working-directory instead of cd
+      if: success() # Publish only if previous steps succeed
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Use NPM_TOKEN, not NODE_AUTH_TOKEN
+    - name: Create Release (if needed - usually done manually)
+      if: success() && github.event_name == 'release'
+      run: |
+        VERSION=${GITHUB_REF/refs\/tags\//}
+        gh release view "${VERSION}" # No need to create release here
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
