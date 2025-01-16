@@ -6,6 +6,8 @@ name: Release CI
 on:
   push:
     tags: "*"
+    branches:
+      - master
 
 env:
   NODE_VERSION: "18.x"
