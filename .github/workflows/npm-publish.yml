@@ -1,0 +1,28 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+
+name: Publish Package to npmjs
+
+on:
+release:
+  types: [created]  # 'created' is usually the preferred trigger for publishing
+
+jobs:
+publish-npm:  # No separate build job needed unless you have tests or other build steps
+  runs-on: ubuntu-latest
+  permissions:
+    contents: read  # Only needed if you're checking out a private repo
+    # id-token: write  # Not needed for publishing to npmjs
+  steps:
+    - uses: actions/checkout@v4
+      if: github.event_name == 'release' # Only checkout if a release is created
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 16.x # LTS version is recommended unless you need 20.x
+        registry-url: 'https://registry.npmjs.org'
+        cache: 'npm' # Cache dependencies for faster builds
+    - run: npm ci
+    - run: npm publish --access public --provenance  # Use correct order and environment variable
+      if: success() && github.event_name == 'release' # Publish only on successful release
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Use NPM_TOKEN, not NODE_AUTH_TOKEN
