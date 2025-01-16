@@ -1,37 +1,15 @@
 # This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
 # For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
 
-name: Node.js Package
-
-on:
-release:
-  types: [created]
-
-jobs:
-build:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 10.x # Use a Node 10.x version
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build  # If you have a build step in your project
-
-publish-npm:
-  needs: build
-  runs-on: ubuntu-latest
-  if: github.event_name == 'release' && github.event.action == 'created' # Only run on release creation
-  steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 10.x  # Match Node version from build job
-        registry-url: https://registry.npmjs.org/
-        cache: 'npm'
-    - run: npm ci
-    - run: npm publish
-      if: success()
-      env:
-        NPM_TOKEN: ${{secrets.npm_token}}
+- name: NPM Publish
+uses: JS-DevTools/npm-publish@v3.1.1
+with:
+  token: ${{ secrets.NPM_TOKEN }}  # Use the correct secret name
+  registry: https://registry.npmjs.org/  # Explicitly set the registry
+  package: ./  # Or specify the path to your package.json
+  tag: latest  # Or a specific tag like 'next' or 'beta'
+  access: public  # Or 'restricted' if needed
+  provenance: true # Recommended for security
+  strategy: 'upgrade' # Publish only if the version is an upgrade
+  ignore-scripts: true # Recommended for security
+  # dry-run: false  # Default is false, uncomment for testing
