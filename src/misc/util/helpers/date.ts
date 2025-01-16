@@ -177,7 +177,7 @@ export const DateUtil = {
 
     clone(date:Date):Date {
         if (typeof date === 'string') {
-            date = new Date(Date.parse(date))
+            date = new Date(Date.parse(date));
         }
         return new Date(date.getTime());
     }
