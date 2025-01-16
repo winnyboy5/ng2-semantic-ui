@@ -4,8 +4,9 @@
 name: Publish Package to npmjs
 
 on:
-release:
-  types: [created]  # 'created' is usually the preferred trigger for publishing
+push:
+  branches:
+    - main  # 'created' is usually the preferred trigger for publishing
 
 jobs:
 publish-npm:  # No separate build job needed unless you have tests or other build steps
