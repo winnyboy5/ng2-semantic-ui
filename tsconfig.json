@@ -18,9 +18,9 @@
       "dom"
     ],
     "paths": {
-      "ng2-semantic-ui": ["dist"],
-      "ng2-semantic-ui/locales": ["dist/locales"],
-      "ng2-semantic-ui/*": ["dist/*"],
+      "@winnyboy5/ng2-semantic-ui": ["dist"],
+      "@winnyboy5/ng2-semantic-ui/locales": ["dist/locales"],
+      "@winnyboy5/ng2-semantic-ui/*": ["dist/*"]
     }
   }
 }
