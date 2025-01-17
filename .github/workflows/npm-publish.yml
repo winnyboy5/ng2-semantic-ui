@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: "https://registry.npmjs.org"
+          scope: '@winnyboy5'
 
       - name: Build package
         run: |
@@ -38,7 +39,6 @@ jobs:
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Create release
         run: |
           VERSION=${GITHUB_REF/refs\/tags\//}
